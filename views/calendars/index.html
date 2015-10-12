@@ -149,7 +149,7 @@
 						}
 					});		
 		}
-		
+	
 		function showEvents(data, calendar_id) {
 		
 			var eventDivName = "#divForEvents_" + calendar_id;
@@ -170,47 +170,20 @@
 						
 					var deleteEvent = "<button onclick=deleteEvent('" + event._id + "')>Delete Event</button>";
 					eventTotal += deleteEvent;
+
 						
 					$(eventDivName).append(eventTotal);
 					
 				$(eventDivName).append("</ul>");	
-					
-					/*
-					var deleteCalendar = "<button onclick=deleteCalendar('" + calendar._id + "')>Delete Calendar</button>";
-					$('#dynamicDiv').append(deleteCalendar);
-					
-					var showCalendar = "<button onclick=getCalendarById('" + calendar._id + "')>Show Calendar</button>";
-					$('#dynamicDiv').append(showCalendar);
-					$('#dynamicDiv').append("</br>");
-					
-					var modifyCalendarName = "<input type =\"text\" id=\"calendar_modify_name_" + calendar._id +"\">";
-					var modifyDescription = "<input type =\"text\" id=\"calendar_modify_description_" + calendar._id +"\">";
-					var editButton = "<button onclick=editCalendar('" + calendar._id + "')>Modify</button>";
-					
-					$('#dynamicDiv').append(modifyCalendarName);
-					$('#dynamicDiv').append(modifyDescription);
-					$('#dynamicDiv').append(editButton);
-					
-					
-					$('#dynamicDiv').append("<h2>Events:</h2>");
-					$('#dynamicDiv').append("<ul>");
-					for (var j = 0; j < calendar.events.length; j++) {
-						var event = calendar.events[j];
-						var eventTotal = "<li><p>Name: " + event.name + "</p>";
-						eventTotal += "<p>Description: " + event.description + "</p>";
-						eventTotal += "<p>ID: " + event._id + "</p>";
-						eventTotal += "<p>Location: " + event.location + "</p>";
-						eventTotal += "<p>Priority: " + event.priority + "</p>";
-						eventTotal += "<p>Start time: " + event.startTime + "</p>";
-						eventTotal += "<p>Start time: " + event.endTime + "</p></li>";
-						var deleteEvent = "<button onclick=deleteEvent('" + event._id + "')>Delete Event</button>";
-						eventTotal += deleteEvent;
-						$('#dynamicDiv').append(eventTotal);
-					}
-					$('#dynamicDiv').append("</ul>");
-					*/
 			}
 			$(eventDivName).append("</ul>");
+			//var newevent="<h3>Here you create a new event:</h3>";
+			  //  newevent += "<input type=\"text\" name=\"event nname\" placeholder=\"e.g. any name\"><br>";
+				//newevent +="<input type=\"text\" name=\"event ddescription\" placeholder=\"e.g any description\">";
+				//newevent +="</br>";
+				//var newEventButton = "<button onclick=javascript: alert(2);>Create Event</button>";
+				//newevent += newEventButton;
+				//$(eventDivName).append(newevent);
 		}
 		
 		function deleteEvent(event_id) {
@@ -226,6 +199,10 @@
 							alert("An error occurred!!");
 						}
 					});
+		}
+		function createCalEvents(){
+			alert("hello world!!!");
+		
 		}
 		
 	</script>
@@ -265,6 +242,7 @@
 		<input type="text" name="calendar description" placeholder="e.g any description" id="cal_desc_tf">
 		</br>
 		<button onclick="createCalendar()">Create Calendar</button>
+		
       <hr>
       <footer>
         <p>&copy;  - Calendar - SinglePlage FrontEnd</p>
