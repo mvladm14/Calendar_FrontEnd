@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="../../stylesheets/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../../stylesheets/style.css">
+    <script src="../../javascripts/modernizr-2.6.2.js"></script>
+	
+	<title>Calendar - SinglePlage FrontEnd</title>
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script>
+	
+		var url = 'http://localhost:3000/api/v1/calendars';	
+		
+		$(document).ready(function(){			
+		$.get(url)
+			.done(function(data){
+				showCalendars(data);		
+			}).fail(function(){
+				$('body').text('Request to '+url+' failed!');
+			});
+		});
+		
+		function showCalendars(data) {
+			for (var i = 0; i < data.length; i++) {
+					var calendar = data[i];
+					var calendarName = "<p> Calendar Name: " + calendar.name + "</p>";
+					var calendarDescription = "<p> Calendar Description: " + calendar.description + "</p>";
+					var calendarID = "<p> Calendar ID: " + calendar._id + "</p>";
+										
+					$('#dynamicDiv').append("<h1>Calendar</h1>");
+					$('#dynamicDiv').append(calendarName);
+					$('#dynamicDiv').append(calendarDescription);
+					$('#dynamicDiv').append(calendarID);
+					
+					var deleteCalendar = "<button onclick=deleteCalendar('" + calendar._id + "')>Delete Calendar</button>";
+					$('#dynamicDiv').append(deleteCalendar);
+					
+					var showCalendar = "<button onclick=getCalendarById('" + calendar._id + "')>Show Calendar</button>";
+					$('#dynamicDiv').append(showCalendar);
+					$('#dynamicDiv').append("</br>");
+					
+					var modifyCalendarName = "<input type =\"text\" id=\"calendar_modify_name_" + calendar._id +"\">";
+					var modifyDescription = "<input type =\"text\" id=\"calendar_modify_description_" + calendar._id +"\">";
+					var editButton = "<button onclick=editCalendar('" + calendar._id + "')>Modify</button>";
+					var showEventsButton = "<button onclick=getEventsByCalendarId('" + calendar._id + "')>Show Events</button>";
+					
+					$('#dynamicDiv').append(modifyCalendarName);
+					$('#dynamicDiv').append(modifyDescription);
+					$('#dynamicDiv').append(editButton);
+					$('#dynamicDiv').append(showEventsButton);
+					
+					var divForEvents = "<div id=\"divForEvents_" + calendar._id + "\">";
+					divForEvents += "</div>";
+					$('#dynamicDiv').append(divForEvents);
+				}
+		}
+		
+		function createCalendar() {
+			var name = document.getElementById('cal_name_tf').value;
+			var description = document.getElementById('cal_desc_tf').value;
+			
+			var xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (xhttp.readyState == 4 && xhttp.status == 200) {
+				  window.location.reload(false);
+				}
+			}
+			xhttp.open("POST", url, true);
+			xhttp.setRequestHeader("Content-type", "application/json");
+			var toSend = '{"name":"' + name +'","description":"' + description +'"}';
+			xhttp.send(toSend);
+		}
+		
+		function deleteCalendar(calendar_id) {
+			var deleteUrl = url + "/" + calendar_id;						
+			$.ajax({
+						url: deleteUrl,
+						type: 'DELETE',
+						dataType: 'json',
+						success: function (data, textStatus, xhr) {
+							window.location.reload(false); 
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							alert("An error occurred!!");
+						}
+					});
+		}
+		
+		function getCalendarById(calendar_id) {
+			var calendarByIdUrl = url + "/" + calendar_id;
+			$.ajax({
+						url: calendarByIdUrl,
+						type: 'GET',
+						dataType: 'json',
+						success: function (data, textStatus, xhr) {
+							var name = data.name;
+							var description = data.description;
+							alert("This is calendar: " + name + " with description: " + description); 
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							alert("An error occurred!!");
+						}
+					});
+		}
+		
+		function editCalendar(calendar_id) {
+			var editUrl = url + "/" + calendar_id;
+			
+			var nameDiv = "calendar_modify_name_" + calendar_id;
+			var descriptionDiv = "calendar_modify_description_" + calendar_id ;
+			
+			var name = document.getElementById(nameDiv).value;
+			var description = document.getElementById(descriptionDiv).value;			
+			var toSend = '{"name":"' + name +'","description":"' + description +'"}';
+			
+			
+			$.ajax({
+						url: editUrl,
+						type: 'PUT',
+						dataType: 'json',
+						contentType: 'application/json',
+						data: toSend,
+						success: function () {
+							window.location.reload(false); 
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							alert("An error occurred!!");
+						}
+					});
+			
+		}
+		
+		
+		/********* EVENTS **********/
+
+		function getEventsByCalendarId(calendar_id) {
+			var eventsByCalendarIdUrl = url + "/" + calendar_id + "/events";
+			$.ajax({
+						url: eventsByCalendarIdUrl,
+						type: 'GET',
+						dataType: 'json',
+						success: function (data, textStatus, xhr) {
+							showEvents(data, calendar_id);
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							alert("An error occurred!!");
+						}
+					});		
+		}
+		
+		function showEvents(data, calendar_id) {
+		
+			var eventDivName = "#divForEvents_" + calendar_id;
+			
+			$(eventDivName).append("<ul>");
+		
+			for (var i = 0; i < data.length; i++) {
+				$(eventDivName).append("<ul>");
+					var event = data[i];
+									
+					var eventTotal = "<li><h3>Name: " + event.name + "</h3></li>";
+						eventTotal += "<p>Description: " + event.description + "</p>";
+						eventTotal += "<p>ID: " + event._id + "</p>";
+						eventTotal += "<p>Location: " + event.location + "</p>";
+						eventTotal += "<p>Priority: " + event.priority + "</p>";
+						eventTotal += "<p>Start time: " + event.startTime + "</p>";
+						eventTotal += "<p>Start time: " + event.endTime + "</p>";
+						
+					var deleteEvent = "<button onclick=deleteEvent('" + event._id + "')>Delete Event</button>";
+					eventTotal += deleteEvent;
+						
+					$(eventDivName).append(eventTotal);
+					
+				$(eventDivName).append("</ul>");	
+					
+					/*
+					var deleteCalendar = "<button onclick=deleteCalendar('" + calendar._id + "')>Delete Calendar</button>";
+					$('#dynamicDiv').append(deleteCalendar);
+					
+					var showCalendar = "<button onclick=getCalendarById('" + calendar._id + "')>Show Calendar</button>";
+					$('#dynamicDiv').append(showCalendar);
+					$('#dynamicDiv').append("</br>");
+					
+					var modifyCalendarName = "<input type =\"text\" id=\"calendar_modify_name_" + calendar._id +"\">";
+					var modifyDescription = "<input type =\"text\" id=\"calendar_modify_description_" + calendar._id +"\">";
+					var editButton = "<button onclick=editCalendar('" + calendar._id + "')>Modify</button>";
+					
+					$('#dynamicDiv').append(modifyCalendarName);
+					$('#dynamicDiv').append(modifyDescription);
+					$('#dynamicDiv').append(editButton);
+					
+					
+					$('#dynamicDiv').append("<h2>Events:</h2>");
+					$('#dynamicDiv').append("<ul>");
+					for (var j = 0; j < calendar.events.length; j++) {
+						var event = calendar.events[j];
+						var eventTotal = "<li><p>Name: " + event.name + "</p>";
+						eventTotal += "<p>Description: " + event.description + "</p>";
+						eventTotal += "<p>ID: " + event._id + "</p>";
+						eventTotal += "<p>Location: " + event.location + "</p>";
+						eventTotal += "<p>Priority: " + event.priority + "</p>";
+						eventTotal += "<p>Start time: " + event.startTime + "</p>";
+						eventTotal += "<p>Start time: " + event.endTime + "</p></li>";
+						var deleteEvent = "<button onclick=deleteEvent('" + event._id + "')>Delete Event</button>";
+						eventTotal += deleteEvent;
+						$('#dynamicDiv').append(eventTotal);
+					}
+					$('#dynamicDiv').append("</ul>");
+					*/
+			}
+			$(eventDivName).append("</ul>");
+		}
+		
+		function deleteEvent(event_id) {
+			var deleteUrl = url + "/events/" + event_id;						
+			$.ajax({
+						url: deleteUrl,
+						type: 'DELETE',
+						dataType: 'json',
+						success: function (data, textStatus, xhr) {
+							window.location.reload(false); 
+						},
+						error: function (xhr, textStatus, errorThrown) {
+							alert("An error occurred!!");
+						}
+					});
+		}
+		
+	</script>
+	
+  </head>
+  
+  <body>
+  
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" data-toggle="collapse" data-target=".navbar-collapse" class="navbar-toggle"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button><a href="/" class="navbar-brand">Calendar - SinglePlage FrontEnd</a>
+        </div>
+        <div class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Home</a></li>
+            <li><a href="/about">About</a></li>
+            <li><a href="/contact">Contact</a></li>
+            <li><a href="/calendar">Calendar</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="container body-content">
+      <h1></h1>
+		<div id="dynamicDiv">
+	
+		</div>
+		
+		<div id="eventsDynamicDiv">
+	
+		</div>
+		
+		</br>
+		<h3>Here you create a new calendar:</h3>
+		<input type="text" name="calendar name" placeholder="e.g. any name" id="cal_name_tf"><br>
+		<input type="text" name="calendar description" placeholder="e.g any description" id="cal_desc_tf">
+		</br>
+		<button onclick="createCalendar()">Create Calendar</button>
+      <hr>
+      <footer>
+        <p>&copy;  - Calendar - SinglePlage FrontEnd</p>
+      </footer>
+    </div>
+    <script src="../../javascripts/jquery-1.10.2.js"></script>
+    <script src="../../javascripts/bootstrap.js"></script>
+    <script src="../../javascripts/respond.js"></script>
+  </body>
+</html>
